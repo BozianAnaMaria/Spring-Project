@@ -1,110 +1,102 @@
 package com.example.lab1;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
+@Data
+@Component
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-class Project {
+class Client{
     private String name;
-    private String description;
-    private int durationInMonths;
-    private double budget;
-    private String client;
-    private List<TeamMember> teamMembers = new ArrayList<>();
-
-    public void addTeamMember(TeamMember member) {
-        teamMembers.add(member);
-    }
-
-    @Override
-    public String toString() {
-        return "Project{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", durationInMonths=" + durationInMonths +
-                ", budget=" + budget +
-                ", client='" + client + '\'' +
-                ", teamMembers=" + teamMembers +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Project project = (Project) o;
-        return durationInMonths == project.durationInMonths &&
-                Double.compare(project.budget, budget) == 0 &&
-                Objects.equals(name, project.name) &&
-                Objects.equals(description, project.description) &&
-                Objects.equals(client, project.client);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, description, durationInMonths, budget, client);
-    }
+    private String email;
 }
 
-// Clasa TeamMember - reprezintă un membru al echipei
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@ToString
+@EqualsAndHashCode
+@Builder
 class TeamMember {
     private String name;
     private String role;
     private int experienceYears;
     private String email;
     private String phoneNumber;
+}
 
-    @Override
-    public String toString() {
-        return "TeamMember{" +
-                "name='" + name + '\'' +
-                ", role='" + role + '\'' +
-                ", experienceYears=" + experienceYears +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                '}';
+@AllArgsConstructor
+@NoArgsConstructor (force = true)
+@Data
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
+@Component
+class Project {
+    private String name;
+    private String description;
+    private int durationInMonths;
+    private double budget;
+    private final Client client; // constructor injected
+    private List<TeamMember> teamMembers = new ArrayList<>();
+
+    public void addTeamMember(TeamMember member) {
+        teamMembers.add(member);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TeamMember that = (TeamMember) o;
-        return experienceYears == that.experienceYears &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(role, that.role) &&
-                Objects.equals(email, that.email) &&
-                Objects.equals(phoneNumber, that.phoneNumber);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, role, experienceYears, email, phoneNumber);
+    // setter injection
+    @Autowired
+    public void setTeamMembers(List<TeamMember> teamMembers) {
+        this.teamMembers = teamMembers;
     }
 }
 
-// Clasa principală cu @SpringBootApplication
+@Configuration
+class AppConfig {
+    @Bean
+    public Client client() {
+        return new Client("Client x", "x@gmail.com");
+    }
+
+    @Bean
+    public TeamMember teamMember1() {
+        return TeamMember.builder()
+                .name("Ana")
+                .role("Engineer")
+                .experienceYears(1)
+                .build();
+    }
+
+    @Bean
+    public TeamMember teamMember2() {
+        return TeamMember.builder()
+                .name("Victor")
+                .role("Developer")
+                .experienceYears(1)
+                .build();
+    }
+}
+
 @SpringBootApplication
 public class Lab1Application {
     public static void main(String[] args) {
-        SpringApplication.run(Lab1Application.class, args);
+        var context = SpringApplication.run(Lab1Application.class, args);
 
-        // Exemplu de utilizare a claselor
-        Project project = new Project("Website Redesign", "Redesign al site-ului companiei", 6, 15000.0, "Client X", new ArrayList<>());
-        TeamMember member1 = new TeamMember("Ana", "QA", 3, "ana@example.com", "+37312345678");
-        TeamMember member2 = new TeamMember("Victor", "Developer", 3, "victor@example.com", "+37312345678");
+        Client client = context.getBean(Client.class);
+        TeamMember member1 = context.getBean("teamMember1", TeamMember.class);
+        TeamMember member2 = context.getBean("teamMember2", TeamMember.class);
+
+        Project project = new Project("Website Redesign", "Redesign company web", 6, 15000.0, client, new ArrayList<>());
 
         project.addTeamMember(member1);
         project.addTeamMember(member2);
