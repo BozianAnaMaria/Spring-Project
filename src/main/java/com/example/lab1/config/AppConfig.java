@@ -1,5 +1,7 @@
-package com.example.lab1;
+package com.example.lab1.config;
 
+import com.example.lab1.model.Client;
+import com.example.lab1.model.TeamMember;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

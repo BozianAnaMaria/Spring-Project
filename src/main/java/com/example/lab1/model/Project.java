@@ -1,4 +1,4 @@
-package com.example.lab1;
+package com.example.lab1.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,25 +10,23 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor(force = true)
 @Data
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @Component
-class Project {
+public class Project {
+    private int id;
     private String name;
     private String description;
     private int durationInMonths;
     private double budget;
-    private final Client client; // constructor injected
+    private Client client;
     private List<TeamMember> teamMembers = new ArrayList<>();
-    private final CustomComponent customComponent; // constructor injection
 
     public void addTeamMember(TeamMember member) {
         teamMembers.add(member);
     }
 
-    // setter injection
     @Autowired
     public void setTeamMembers(List<TeamMember> teamMembers) {
         this.teamMembers = teamMembers;

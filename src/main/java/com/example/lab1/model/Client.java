@@ -1,4 +1,4 @@
-package com.example.lab1;
+package com.example.lab1.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 @NoArgsConstructor
-class Client {
+public class Client {
     private String name;
     private String email;
 }
